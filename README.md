@@ -1,0 +1,1 @@
+isofish is a cartesian, homogeneous mesh, incompressible flow solver based on a fractional step method. In the current state, a levelset function defines the immersed boundaries of a circular cylinder.
