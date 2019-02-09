@@ -1,4 +1,8 @@
 FC =     mpif90
+
+.SUFFIXES:
+.SUFFIXES: .f .f90 .F90 .o
+
 # FC =     mpiifort
 # LDFLAGS = -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core \
           ${MKLROOT}/../compiler/lib/intel64/libiomp5.so \
@@ -25,7 +29,6 @@ SOURCES = flowprops.f90 \
 
 
 OBJECT = $(SOURCES:.f90=.o)
-
 
 $(EXE): $(OBJECT)
 	$(FC) $(FFLAGS) -o $@ $^
