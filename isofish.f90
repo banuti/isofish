@@ -44,7 +44,7 @@ REAL::qmax
 !=================================================================================
 WRITE(*,*)'========================'
 WRITE(*,*)'isofish flow simulation'
-WRITE(*,*)'Daniel Banuti, 2018'
+WRITE(*,*)'Daniel Banuti, 2019'
 WRITE(*,*)'daniel@banuti.com'
 WRITE(*,*)'========================'
 
