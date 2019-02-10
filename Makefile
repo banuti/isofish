@@ -1,4 +1,5 @@
-FC =     mpif90
+FC = gfortran-4.9
+#FC =     mpif90
 # FC =     mpiifort
 # LDFLAGS = -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core \
           ${MKLROOT}/../compiler/lib/intel64/libiomp5.so \
