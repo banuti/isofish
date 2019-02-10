@@ -27,71 +27,71 @@
 ! - square cylinder?
 !----------------------------------------------------------------------
 
-	USE flowprops
-	USE modoutput
-	USE modanalysis
-	USE boundaries
-	USE modconvect
-	USE moddiffuse
-	USE modmass
-	USE modconfinement
 
-	INTEGER::saved
-	REAL::qmax
+USE flowprops
+USE modoutput
+USE modanalysis
+USE boundaries
+USE modconvect
+USE moddiffuse
+USE modmass
+USE modconfinement
+
+INTEGER::saved
+REAL::qmax
 
 
 !=================================================================================
-  WRITE(*,*)'========================'
-	WRITE(*,*)'isofish flow simulation'
-	WRITE(*,*)'Daniel Banuti, 2018'
-	WRITE(*,*)'daniel@banuti.com'
-	WRITE(*,*)'========================'
+WRITE(*,*)'========================'
+WRITE(*,*)'isofish flow simulation'
+WRITE(*,*)'Daniel Banuti, 2018'
+WRITE(*,*)'daniel@banuti.com'
+WRITE(*,*)'========================'
 
 !level-set function
 
+CALL readprops !in flowprops.f90
 
-	CALL readprops !in flowprops.f90
+CALL level_funct !in flowprops.f90
 
-  CALL level_funct !in flowprops.f90
+CALL init !in flowprops.f90
 
-	CALL init !in flowprops.f90
-
-  CALL initial !(qinf,nswit,time)
+CALL initial !(qinf,nswit,time)
 
 
 
 ! initial conditions
 
 
-	WRITE(*,*)'	MAIN:'
-	WRITE(*,*)'...done:'
-	WRITE(*,*)'nswit	   = ',nswit 			!computation mode
-	WRITE(*,*)'nmax		   = ',nmax			!timesteps
-	WRITE(*,*)'delt		   = ',delt
-	WRITE(*,*)'eps_s	   = ',eps_s
-	WRITE(*,*)'epsns_s	 = ',epsns_s
-	WRITE(*,*)'xmue		   = ',xmue
-	WRITE(*,*)'alpha_deg = ',alpha_deg		!angle of attack
-	WRITE(*,*)'outoffs	 = ',outoffs			!offset start of output
-	WRITE(*,*)'outint	   = ',outint			!output interval
-	WRITE(*,*)'no i      = ',imax
-	WRITE(*,*)'no j      = ',jmax
-	WRITE(*,*)'no k      = ',kmax
+WRITE(*,*)'	MAIN:'
+WRITE(*,*)'...done:'
+WRITE(*,*)'nswit	   = ',nswit !computation mode
+WRITE(*,*)'nmax		   = ',nmax  !timesteps
+WRITE(*,*)'delt		   = ',delt
+WRITE(*,*)'eps_s	   = ',eps_s
+WRITE(*,*)'epsns_s	 = ',epsns_s
+WRITE(*,*)'xmue		   = ',xmue
+WRITE(*,*)'alpha_deg = ',alpha_deg    !angle of attack
+WRITE(*,*)'outoffs	 = ',outoffs  !offset start of output
+WRITE(*,*)'outint	   = ',outint !output interval
+WRITE(*,*)'no i      = ',imax
+WRITE(*,*)'no j      = ',jmax
+WRITE(*,*)'no k      = ',kmax
 
 
-	saved=0
+saved=0
 
 !----------------------------------------------------------------------
-	CALL outhead
+CALL outhead
 
 
-	IF (nswit .EQ. 0) THEN
-	  IF (perturb .NE. 0) THEN
+IF (nswit .EQ. 0) THEN
+  IF (perturb .NE. 0) THEN
 
-			CALL perturbation
+    CALL perturbation
 
-	  END IF
-	END IF
+  END IF
+END IF
 
 
 
@@ -104,97 +104,93 @@
 
 
         time = time+delt
-	  WRITE(*,*)
-	  WRITE(*,*)
+        WRITE(*,*)
+        WRITE(*,*)
         WRITE(*,*) 'T I M E S T E P: ',n,time
 
   IF (n .EQ. nmax) THEN
           deltat = delt
-	 END IF
+   END IF
 
 
 
 
 
-	IF (nswit .NE. 3) THEN
+  IF (nswit .NE. 3) THEN
 
-	!		IF (n .LT. 10) THEN
-!convection calculation
-			CALL convection !(delt,qinf)
-	!		END IF
+    !		IF (n .LT. 10) THEN
+    !convection calculation
+    CALL convection !(delt,qinf)
+    !		END IF
 
 
-!add diffusion
-        CALL diffusion !(xmue,delt,qinf)
-	END IF
+    !add diffusion
+    CALL diffusion !(xmue,delt,qinf)
+  END IF
 
 !
 !add confinement term
-        CALL vort_conf(n) !(qinf,delt,n)
+    CALL vort_conf(n) !(qinf,delt,n)
 
 !mass conservation
-        CALL masscon !(phi)
+    CALL masscon !(phi)
 
 
-	IF (nswit.NE. 3.) THEN
-!satisfy momentum conservation
-        CALL momentum !(phi,qinf)
-	END IF
+  IF (nswit.NE. 3.) THEN
+    !satisfy momentum conservation
+    CALL momentum !(phi,qinf)
+  END IF
 
 
-
-	CALL getspeed
+CALL getspeed
 
 !Velocity-Field
-	qmax=maxval(q)
-	WRITE(*,*)'Maximum Velocity-Component: ', qmax
-	WRITE(*,*)'at: ',maxloc(q)
-	WRITE(*,*)'Freestream: q(5,j0,k0,1): ',q(5,j0,k0,1)
-	WRITE(*,*)'Freestream: phi(5,j0,k0): ',phi(5,j0,k0)
+qmax=maxval(q)
+WRITE(*,*)'Maximum Velocity-Component: ', qmax
+WRITE(*,*)'at: ',maxloc(q)
+WRITE(*,*)'Freestream: q(5,j0,k0,1): ',q(5,j0,k0,1)
+WRITE(*,*)'Freestream: phi(5,j0,k0): ',phi(5,j0,k0)
 
 
 
 
 !in case of instability
-	IF ((qmax .GT. 5.) .AND. saved .eq. 0) THEN
-		CALL pressure !(deltat) !(phi,cp,deltat,qinfinity)
-		CALL output !(time, cp)
-		saved=1
-	END IF
+IF ((qmax .GT. 5.) .AND. saved .eq. 0) THEN
+  CALL pressure !(deltat) !(phi,cp,deltat,qinfinity)
+  CALL output !(time, cp)
+  saved=1
+END IF
 
 
 
 !REPORT
       CALL pressure
-	CALL drag
-	CALL lift
-
-	CALL outreports(n,qmax)
-
-
-	WRITE(*,*)'Drag: ',Cd
-	WRITE(*,*)'Lift: ',Cl
-	WRITE(*,*)'Max vort: ',maxval(absomega)
+CALL drag
+CALL lift
+CALL outreports(n,qmax)
 
 
-
-	!from timestep outoffs save every outint'th step
-	IF ( (n .GE. outoffs) .AND. ( (modulo(n-outoffs,outint) .EQ. 0) &
-     	.OR. (n-outoffs) .EQ. 0)) THEN
-
-		WRITE(*,*)'Output timestep ',n
-
-		CALL outstep(n,qmax)
+WRITE(*,*)'Drag: ',Cd
+WRITE(*,*)'Lift: ',Cl
+WRITE(*,*)'Max vort: ',maxval(absomega)
 
 
-	END IF
+
+!from timestep outoffs save every outint'th step
+IF ( (n .GE. outoffs) .AND. ( (modulo(n-outoffs,outint) .EQ. 0) &
+    .OR. (n-outoffs) .EQ. 0)) THEN
+
+  WRITE(*,*)'Output timestep ',n
+  CALL outstep(n,qmax)
+
+END IF
 
 
 
 !SUMMATION TO GET AVERAGE VALUES
-	IF (n .GE. outoffs) THEN
-		q_avg=q_avg+q
-	END IF
+IF (n .GE. outoffs) THEN
+  q_avg=q_avg+q
+END IF
 
 
 
@@ -202,20 +198,20 @@
 !**********************END LOOP*********************************
 
 !COMPUTE AVG
-	q_avg=q_avg/real(n-outoffs+1)
+q_avg=q_avg/real(n-outoffs+1)
 
 
 
-      CALL pressure !(deltat) !(phi,cp,deltat,qinfinity)
+CALL pressure !(deltat) !(phi,cp,deltat,qinfinity)
 
-	CALL outavg
+CALL outavg
 
 
-      CALL output !(time,cp)
+CALL output !(time,cp)
 
-	CALL outend
+CALL outend
 
-	DEALLOCATE(cppnts)
+DEALLOCATE(cppnts)
 
 
       END
