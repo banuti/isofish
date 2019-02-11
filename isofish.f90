@@ -59,7 +59,7 @@ CALL initlevelset !in flowprops.f90
 
 CALL initfield !in flowprops.f90
 
-CALL initial !(qinf,nswit,time)
+CALL initqfield !(qinf,nswit,time)
 
 
 

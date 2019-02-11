@@ -3,33 +3,32 @@ MODULE flowprops
 IMPLICIT NONE
 
 !flowfield
-	INTEGER	::imax,jmax,kmax,ipmax,jpmax,kpmax,i0,j0,k0
-	INTEGER	::nmax,n_step,outoffs,outint,nswit,perturb,geometry
-	REAL	::delt,delx,dely,delz,xmue,rho,alpha_deg,alpha,qinfinity,time,D,fieldRad
+INTEGER ::imax,jmax,kmax,ipmax,jpmax,kpmax,i0,j0,k0
+INTEGER ::nmax,n_step,outoffs,outint,nswit,perturb,geometry
+REAL    ::delt,delx,dely,delz,xmue,rho,alpha_deg,alpha,qinfinity,time,D,fieldRad
 
 
 !	PARAMETER (imax=91,jmax=7,kmax=51,ipmax=90,jpmax=6,kpmax=50)		!D=10
-	PARAMETER (imax=181,jmax=7,kmax=101,ipmax=180,jpmax=6,kpmax=100)	!D=20
+PARAMETER (imax=181,jmax=7,kmax=101,ipmax=180,jpmax=6,kpmax=100)        !D=20
 ! PARAMETER (imax=181,jmax=4,kmax=101,ipmax=180,jpmax=3,kpmax=100)	!D=20
-	! PARAMETER (imax=361,jmax=7,kmax=201,ipmax=360,jpmax=6,kpmax=200)	!D=40
+! PARAMETER (imax=361,jmax=7,kmax=201,ipmax=360,jpmax=6,kpmax=200)	!D=40
 
 
  !   PARAMETER (imax=189,jmax=71,kmax=101,ipmax=188,jpmax=70,kpmax=100)
 
 
 !	PARAMETER (imax=201,jmax=81,kmax=161,ipmax=200,jpmax=80,kpmax=160)
+REAL  ::F(imax,jmax,kmax), Fnormp(ipmax,jpmax,kpmax,3), Fp(ipmax,jpmax,kpmax)
+REAL::qinf(3),q(imax,jmax,kmax,3),q_avg(imax,jmax,kmax,3)
+REAL::phi(ipmax,jpmax,kpmax),cp(ipmax,jpmax,kpmax),pi
+REAL::eps(imax,jmax,kmax), epsns(imax,jmax,kmax),mark(imax,jmax,kmax)
+REAL::eps_s, epsns_s
+REAL::omega(ipmax,jpmax,kpmax,3),absomega(ipmax,jpmax,kpmax)
+REAL::Cd,Cl,spd(imax,jmax,kmax)
 
-  REAL	::F(imax,jmax,kmax), Fnormp(ipmax,jpmax,kpmax,3), Fp(ipmax,jpmax,kpmax)
-	REAL	::qinf(3),q(imax,jmax,kmax,3),q_avg(imax,jmax,kmax,3)
-	REAL	::phi(ipmax,jpmax,kpmax),cp(ipmax,jpmax,kpmax),pi
-	REAL	::eps(imax,jmax,kmax), epsns(imax,jmax,kmax),mark(imax,jmax,kmax)
-	REAL	::eps_s, epsns_s
-	REAL	::omega(ipmax,jpmax,kpmax,3),absomega(ipmax,jpmax,kpmax)
-	REAL	::Cd,Cl,spd(imax,jmax,kmax)
+REAL, DIMENSION(:,:), ALLOCATABLE::cppnts
 
-	REAL, DIMENSION(:,:), ALLOCATABLE::cppnts
-
-	INTEGER	::numpnts,numvar
+INTEGER ::numpnts,numvar
 
 CONTAINS
 
@@ -173,29 +172,29 @@ END SUBROUTINE
 
 SUBROUTINE readinput
 
-CHARACTER(LEN=10)	::dummy
+CHARACTER(LEN=10) ::dummy
 
 WRITE(*,*)'reading properties from file...'
 
 OPEN(10,file='isofish.inp')
 READ(10,*)dummy,nswit,dummy,eps_s,dummy,epsns_s,dummy,xmue,dummy, &
-					delt,dummy,nmax,dummy,outoffs,dummy,outint,dummy,alpha_deg, &
-					dummy,perturb,dummy,D,dummy,fieldRad,dummy,geometry
+      delt,dummy,nmax,dummy,outoffs,dummy,outint,dummy,alpha_deg, &
+      dummy,perturb,dummy,D,dummy,fieldRad,dummy,geometry
 CLOSE(10)
 
 WRITE(*,*)'...done:'
-WRITE(*,*)'nswit     = ',nswit 			!computation mode
-WRITE(*,*)'nmax      = ',nmax			!timesteps
+WRITE(*,*)'nswit     = ',nswit          !computation mode
+WRITE(*,*)'nmax      = ',nmax           !timesteps
 WRITE(*,*)'delt      = ',delt
 WRITE(*,*)'eps_s     = ',eps_s
 WRITE(*,*)'epsns_s   = ',epsns_s
 WRITE(*,*)'xmue      = ',xmue
-WRITE(*,*)'alpha_deg = ',alpha_deg		!angle of attack
-WRITE(*,*)'outoff    = ',outoffs			!offset start of output
-WRITE(*,*)'outin     = ',outint			!output interval
-WRITE(*,*)'perturb   = ',perturb			!perturbation?
-WRITE(*,*)'fieldRad  = ',fieldRad		!radius for field confinement
-WRITE(*,*)'geometry  = ',geometry		!levelset fct
+WRITE(*,*)'alpha_deg = ',alpha_deg       !angle of attack
+WRITE(*,*)'outoff    = ',outoffs         !offset start of output
+WRITE(*,*)'outin     = ',outint          !output interval
+WRITE(*,*)'perturb   = ',perturb         !perturbation?
+WRITE(*,*)'fieldRad  = ',fieldRad        !radius for field confinement
+WRITE(*,*)'geometry  = ',geometry        !levelset fct
 WRITE(*,*)
 
 
@@ -204,7 +203,8 @@ END SUBROUTINE
 !------------------------------------------------------------------
 
 
-SUBROUTINE initial !(qinf,nswit,time)
+SUBROUTINE initqfield
+ !(qinf,nswit,time)
 
 
   REAL    ::R,deli,delj,delk,rad4,speed
@@ -247,25 +247,25 @@ IF (geometry .EQ. 1) THEN
 
 DO i=1, imax
   DO j=1, jmax
-	DO k=1, kmax
-
-	IF (F(i,j,k) .GT. 0.) THEN
-
-		deli=real(i-i0)
-		delj=real(j-j0)
-		delk=real(k-k0)
-
-		q(i,j,k,1)=qinf(1)*(1+(R**2*(delk**2-deli**2)/(MAX(0.01,(deli**2+delk**2)**2))))
-		q(i,j,k,2)=0.
-		q(i,j,k,3)=-2*qinf(1)*R**2*deli*delk/(MAX(0.01,(deli**2+delk**2)**2))
-
-	ELSE
-
-		q(i,j,k,:)=0.
-
-	END IF
-
-	END DO
+    DO k=1, kmax
+    
+      IF (F(i,j,k) .GT. 0.) THEN
+      
+        deli=real(i-i0)
+        delj=real(j-j0)
+        delk=real(k-k0)
+      
+        q(i,j,k,1)=qinf(1)*(1+(R**2*(delk**2-deli**2)/(MAX(0.01,(deli**2+delk**2)**2))))
+        q(i,j,k,2)=0.
+        q(i,j,k,3)=-2*qinf(1)*R**2*deli*delk/(MAX(0.01,(deli**2+delk**2)**2))
+      
+      ELSE
+      
+        q(i,j,k,:)=0.
+      
+      END IF
+      
+    END DO
   END DO
 END DO
 
@@ -352,18 +352,18 @@ END IF
 
 SUBROUTINE perturbation
 
-INTEGER	::i,j,k
+INTEGER ::i,j,k
 
 DO i=i0, i0+D/2.
   DO k=k0+5, k0+D/1.5
 
-	IF (F(i,j0,k) .GE. 1.0) THEN
+    IF (F(i,j0,k) .GE. 1.0) THEN
 
-		q(i,:,k,1)=1.7
-		q(i,:,k,2)=0.
-		q(i,:,k,3)=0.
+      q(i,:,k,1)=1.7
+      q(i,:,k,2)=0.
+      q(i,:,k,3)=0.
 
-	END IF
+    END IF
 
   END DO
 END DO
