@@ -11,6 +11,12 @@ perturb	1
 D		32.
 L		10.
 geometry	1
+qinfinity       2.
+
+
+!not currently read
 intoffset	1
 intpoints	10
 intertype	2
+qinfinity       5.
+

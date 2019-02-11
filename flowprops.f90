@@ -13,7 +13,6 @@ PARAMETER (imax=181,jmax=7,kmax=101,ipmax=180,jpmax=6,kpmax=100)        !D=20
 ! PARAMETER (imax=181,jmax=4,kmax=101,ipmax=180,jpmax=3,kpmax=100)	!D=20
 ! PARAMETER (imax=361,jmax=7,kmax=201,ipmax=360,jpmax=6,kpmax=200)	!D=40
 
-
  !   PARAMETER (imax=189,jmax=71,kmax=101,ipmax=188,jpmax=70,kpmax=100)
 
 
@@ -75,7 +74,12 @@ epsns = epsns_s
 !      epsns_s = 0.	!0.2
 !      xmue = 0.1	!0.0025
 ! Anstroemgeschwindigkeit
-      qinfinity = 1.
+
+
+!      qinfinity = 1.
+
+WRITE(*,*)'Init with qinfinity',qinfinity
+
 ! angle of attack
 !      alpha_deg = 0.
 ! in Bogenmass
@@ -179,7 +183,9 @@ WRITE(*,*)'reading properties from file...'
 OPEN(10,file='isofish.inp')
 READ(10,*)dummy,nswit,dummy,eps_s,dummy,epsns_s,dummy,xmue,dummy, &
       delt,dummy,nmax,dummy,outoffs,dummy,outint,dummy,alpha_deg, &
-      dummy,perturb,dummy,D,dummy,fieldRad,dummy,geometry
+      dummy,perturb,dummy,D,dummy,fieldRad,dummy,geometry, &
+      dummy, qinfinity
+
 CLOSE(10)
 
 WRITE(*,*)'...done:'
@@ -195,6 +201,7 @@ WRITE(*,*)'outin     = ',outint          !output interval
 WRITE(*,*)'perturb   = ',perturb         !perturbation?
 WRITE(*,*)'fieldRad  = ',fieldRad        !radius for field confinement
 WRITE(*,*)'geometry  = ',geometry        !levelset fct
+WRITE(*,*)'qinfinity = ',qinfinity       !magnitude of velocity
 WRITE(*,*)
 
 
