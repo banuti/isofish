@@ -42,19 +42,22 @@ REAL::qmax
 
 
 !=================================================================================
-WRITE(*,*)'========================'
-WRITE(*,*)'isofish flow simulation'
-WRITE(*,*)'Daniel Banuti, 2019'
-WRITE(*,*)'daniel@banuti.com'
-WRITE(*,*)'========================'
+WRITE(*,*)
+WRITE(*,*)'================================'
+WRITE(*,*)'isofish flow simulation   __||_    '
+WRITE(*,*)'Daniel Banuti, 2019       \_||_\  '
+WRITE(*,*)'daniel@banuti.com          2019  '
+WRITE(*,*)'================================'
+WRITE(*,*)
+
 
 !level-set function
 
-CALL readprops !in flowprops.f90
+CALL readinput !in flowprops.f90
 
-CALL level_funct !in flowprops.f90
+CALL initlevelset !in flowprops.f90
 
-CALL init !in flowprops.f90
+CALL initfield !in flowprops.f90
 
 CALL initial !(qinf,nswit,time)
 
@@ -63,20 +66,20 @@ CALL initial !(qinf,nswit,time)
 ! initial conditions
 
 
-WRITE(*,*)'	MAIN:'
-WRITE(*,*)'...done:'
-WRITE(*,*)'nswit	   = ',nswit !computation mode
-WRITE(*,*)'nmax		   = ',nmax  !timesteps
-WRITE(*,*)'delt		   = ',delt
-WRITE(*,*)'eps_s	   = ',eps_s
-WRITE(*,*)'epsns_s	 = ',epsns_s
-WRITE(*,*)'xmue		   = ',xmue
-WRITE(*,*)'alpha_deg = ',alpha_deg    !angle of attack
-WRITE(*,*)'outoffs	 = ',outoffs  !offset start of output
-WRITE(*,*)'outint	   = ',outint !output interval
-WRITE(*,*)'no i      = ',imax
-WRITE(*,*)'no j      = ',jmax
-WRITE(*,*)'no k      = ',kmax
+!WRITE(*,*)'	MAIN:'
+!WRITE(*,*)'...done:'
+!WRITE(*,*)'nswit	   = ',nswit !computation mode
+!WRITE(*,*)'nmax		   = ',nmax  !timesteps
+!WRITE(*,*)'delt		   = ',delt
+!WRITE(*,*)'eps_s	   = ',eps_s
+!WRITE(*,*)'epsns_s	 = ',epsns_s
+!WRITE(*,*)'xmue		   = ',xmue
+!WRITE(*,*)'alpha_deg = ',alpha_deg    !angle of attack
+!WRITE(*,*)'outoffs	 = ',outoffs  !offset start of output
+!WRITE(*,*)'outint	   = ',outint !output interval
+!WRITE(*,*)'no i      = ',imax
+!WRITE(*,*)'no j      = ',jmax
+!WRITE(*,*)'no k      = ',kmax
 
 
 saved=0

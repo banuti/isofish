@@ -35,10 +35,13 @@ CONTAINS
 
 !===================================================================
 
-SUBROUTINE init
+SUBROUTINE initfield
 
-INTEGER	::islice,jslice,kslice,i,j,k,ip,jp,kp,iprime,kprime,jprime
-REAL	::Fabs,Fptemp,h
+INTEGER ::islice,jslice,kslice,i,j,k,ip,jp,kp,iprime,kprime,jprime
+REAL    ::Fabs,Fptemp,h
+
+WRITE(*,*)'Init field'
+
 
 ! GRID
 h = 1.
@@ -48,15 +51,15 @@ dely = h
 delz = h
 
 
-jslice=j0
-numvar=4
+jslice = j0
+numvar = 4
 
-q_avg=0.
-Cd=0.
-Cl=0.
+q_avg = 0.
+Cd    = 0.
+Cl    = 0.
 
-eps=eps_s
-epsns=epsns_s
+eps   = eps_s
+epsns = epsns_s
 
 
 ! switch for continued calculation
@@ -86,119 +89,111 @@ epsns=epsns_s
 
 
 !TRANSFORM LEVELSET FUNCTION TO PRESSURE GRID
-WRITE(*,*)'Transform Grid'
-	DO ip=1, ipmax
-	  DO jp=1, jpmax
-	    DO kp=1, kpmax
-
-			Fptemp=0.
-
-			DO i=ip,ip+1
-			  DO j=jp, jp+1
-				DO k=kp, kp+1
-					Fptemp=Fptemp+F(i,j,k)
-				END DO
-			  END DO
-			END DO
-
-			Fp(ip,jp,kp)=Fptemp/8.
-
-		END DO
-	  END DO
-	END DO
+  WRITE(*,*)'Transform Grid'
+  DO ip=1, ipmax
+    DO jp=1, jpmax
+      DO kp=1, kpmax
+        
+        Fptemp=0.
+        
+        DO i=ip,ip+1
+          DO j=jp, jp+1
+            DO k=kp, kp+1
+              Fptemp=Fptemp+F(i,j,k)
+            END DO
+          END DO
+        END DO
+        
+        Fp(ip,jp,kp)=Fptemp/8.
+        
+      END DO
+    END DO
+  END DO
 
 
 
 !GET GRADIENT OF LEVELSET IN PRESSURE GRID
-
-	Fnormp=0.
-
-	DO i=2, ipmax-1
-	  DO j=2, jpmax-1
-	    DO k=2, kpmax-1
-
-		Fnormp(i,j,k,1)=(Fp(i+1,j,k)-Fp(i-1,j,k))/(2*delx)
-		Fnormp(i,j,k,2)=(Fp(i,j+1,k)-Fp(i,j-1,k))/(2*dely)
-		Fnormp(i,j,k,3)=(Fp(i,j,k+1)-Fp(i,j,k-1))/(2*delz)
-
-		Fabs=SQRT(max(0.00001,(Fnormp(i,j,k,1)**2+Fnormp(i,j,k,2)**2+Fnormp(i,j,k,3)**2)))
-
-		Fnormp(i,j,k,:)=Fnormp(i,j,k,:)/Fabs
-
-		END DO
-	  END DO
-	END DO
-
-	Fnormp(1,:,:,:)=Fnormp(2,:,:,:)
-	Fnormp(ipmax,:,:,:)=Fnormp(ipmax-1,:,:,:)
-
-	Fnormp(:,1,:,:)=Fnormp(:,2,:,:)
-	Fnormp(:,jpmax,:,:)=Fnormp(:,jpmax-1,:,:)
-
-	Fnormp(:,:,1,:)=Fnormp(:,:,2,:)
-	Fnormp(:,:,kpmax,:)=Fnormp(:,:,kpmax-1,:)
-
-
-
-
+  
+  Fnormp=0.
+  
+  DO i=2, ipmax-1
+    DO j=2, jpmax-1
+      DO k=2, kpmax-1
+  
+        Fnormp(i,j,k,1)=(Fp(i+1,j,k)-Fp(i-1,j,k))/(2*delx)
+        Fnormp(i,j,k,2)=(Fp(i,j+1,k)-Fp(i,j-1,k))/(2*dely)
+        Fnormp(i,j,k,3)=(Fp(i,j,k+1)-Fp(i,j,k-1))/(2*delz)
+        
+        Fabs=SQRT(max(0.00001,(Fnormp(i,j,k,1)**2+Fnormp(i,j,k,2)**2+Fnormp(i,j,k,3)**2)))
+        
+        Fnormp(i,j,k,:)=Fnormp(i,j,k,:)/Fabs
+        
+      END DO
+    END DO
+  END DO
+  
+  Fnormp(1,:,:,:)=Fnormp(2,:,:,:)
+  Fnormp(ipmax,:,:,:)=Fnormp(ipmax-1,:,:,:)
+  
+  Fnormp(:,1,:,:)=Fnormp(:,2,:,:)
+  Fnormp(:,jpmax,:,:)=Fnormp(:,jpmax-1,:,:)
+  
+  Fnormp(:,:,1,:)=Fnormp(:,:,2,:)
+  Fnormp(:,:,kpmax,:)=Fnormp(:,:,kpmax-1,:)
+  
 
 !ESTIMATE NUMBER OF BOUNDARY CELLS
-	numpnts=0
-
-	DO k=1,kpmax
-	  DO i=1,ipmax
-		kprime=k
-		iprime=i
-
-		IF (Fp(i,jslice,k).LT. 0.) THEN
-		  DO iprime=(i-1), (i+1), 2
-			IF (Fp(iprime,jslice,k).GT. 0.) numpnts=numpnts+1
-		  END DO
-		  DO kprime=(k-1), (k+1), 2
-			IF (Fp(i,jslice,kprime).GT. 0.) numpnts=numpnts+1
-		  END DO
-		END IF
-	  END DO
-	END DO
-
-	WRITE(*,*)'Number of boundarycells: ',numpnts
-
-
-	ALLOCATE(cppnts(numpnts, numvar))
+  numpnts=0
+  
+  DO k=1,kpmax
+    DO i=1,ipmax
+      kprime=k
+      iprime=i
+      
+      IF (Fp(i,jslice,k).LT. 0.) THEN
+        DO iprime=(i-1), (i+1), 2
+          IF (Fp(iprime,jslice,k).GT. 0.) numpnts=numpnts+1
+        END DO
+        DO kprime=(k-1), (k+1), 2
+          IF (Fp(i,jslice,kprime).GT. 0.) numpnts=numpnts+1
+        END DO
+      END IF
+    END DO
+  END DO
+  
+  WRITE(*,*)'Number of boundarycells: ',numpnts
 
 
-
-
-
+ALLOCATE(cppnts(numpnts, numvar))
 
 
 END SUBROUTINE
 
 !------------------------------------------------------------------
 
-SUBROUTINE readprops
+SUBROUTINE readinput
 
 CHARACTER(LEN=10)	::dummy
 
 WRITE(*,*)'reading properties from file...'
 
-OPEN(10,file='properties.inp')
+OPEN(10,file='isofish.inp')
 READ(10,*)dummy,nswit,dummy,eps_s,dummy,epsns_s,dummy,xmue,dummy, &
 					delt,dummy,nmax,dummy,outoffs,dummy,outint,dummy,alpha_deg, &
 					dummy,perturb,dummy,D,dummy,fieldRad,dummy,geometry
 CLOSE(10)
 
 WRITE(*,*)'...done:'
-WRITE(*,*)'nswit	   = ',nswit 			!computation mode
-WRITE(*,*)'nmax		   = ',nmax			!timesteps
-WRITE(*,*)'delt		   = ',delt
-WRITE(*,*)'eps_s	   = ',eps_s
-WRITE(*,*)'epsns_s	 = ',epsns_s
-WRITE(*,*)'xmue		   = ',xmue
+WRITE(*,*)'nswit     = ',nswit 			!computation mode
+WRITE(*,*)'nmax      = ',nmax			!timesteps
+WRITE(*,*)'delt      = ',delt
+WRITE(*,*)'eps_s     = ',eps_s
+WRITE(*,*)'epsns_s   = ',epsns_s
+WRITE(*,*)'xmue      = ',xmue
 WRITE(*,*)'alpha_deg = ',alpha_deg		!angle of attack
-WRITE(*,*)'outoffs	 = ',outoffs			!offset start of output
-WRITE(*,*)'outint	   = ',outint			!output interval
-WRITE(*,*)'perturb	 = ',perturb			!perturbation?
+WRITE(*,*)'outoff    = ',outoffs			!offset start of output
+WRITE(*,*)'outin     = ',outint			!output interval
+WRITE(*,*)'perturb   = ',perturb			!perturbation?
 WRITE(*,*)'fieldRad  = ',fieldRad		!radius for field confinement
 WRITE(*,*)'geometry  = ',geometry		!levelset fct
 WRITE(*,*)
@@ -212,8 +207,8 @@ END SUBROUTINE
 SUBROUTINE initial !(qinf,nswit,time)
 
 
-REAL	::R,deli,delj,delk,rad4,speed
-INTEGER	::i,j,k,l,ix,jy,kz
+  REAL    ::R,deli,delj,delk,rad4,speed
+  INTEGER ::i,j,k,l,ix,jy,kz
 
 ! initial conditions for far field flow around an ellipsoid
 
@@ -224,12 +219,10 @@ INTEGER	::i,j,k,l,ix,jy,kz
 
 !      COMMON /velo/ q(imax,jmax,kmax,3)
 
-      WRITE(*,*) "check: initial values"
-	  WRITE(*,*)'comp mode nswit: ',nswit
+  WRITE(*,*) "check: initial values"
+  WRITE(*,*)'comp mode nswit: ',nswit
 
-
-
-R=D/2.
+  R=D/2.
 
 
 
@@ -381,11 +374,11 @@ END DO
 END SUBROUTINE
 
 !------------------------------------------------------------------------
-SUBROUTINE level_funct
+SUBROUTINE initlevelset
 
 
-REAL	::deli,delj,delk,R
-INTEGER	::i,j,k,l,ix,jy,kz
+REAL    ::deli,delj,delk,R
+INTEGER ::i,j,k,l,ix,jy,kz
 
 R=real(D)/2.
 
@@ -402,7 +395,7 @@ WRITE(*,*)'reading levelset file'
       CLOSE(22)
 
 
-	F=F*10.
+      F=F*10.
 
 END IF
 
@@ -413,31 +406,31 @@ END IF
 !X-CYL
 IF (geometry .EQ. 1) THEN
 
-WRITE(*,*)'computing x-cyl levelset'
-
-	! i0=3.5*D
-	i0 = imax/4. + R
-	j0 = jmax/2. - 0.5
-	k0 = kmax/2. - 0.5
-
-	WRITE(*,*)'i0=',i0
-	WRITE(*,*)'j0=',j0
-	WRITE(*,*)'k0=',k0
-
-	 DO i = 1,imax
-        DO j = 1,jmax
-          DO k = 1,kmax
-
-		  deli=real(i-i0)
-		  delj=real(j-j0)
-		  delk=real(k-k0)
-
-  F(i,j,k) = (SQRT(deli**2. + delk**2.) - R)
-
+  WRITE(*,*)'computing x-cyl levelset'
+  
+  ! i0=3.5*D
+  i0 = imax/4. + R
+  j0 = jmax/2. - 0.5
+  k0 = kmax/2. - 0.5
+  
+  WRITE(*,*)'i0=',i0
+  WRITE(*,*)'j0=',j0
+  WRITE(*,*)'k0=',k0
+  
+   DO i = 1,imax
+     DO j = 1,jmax
+        DO k = 1,kmax
+  
+          deli=real(i-i0)
+          delj=real(j-j0)
+          delk=real(k-k0)
+  
+           F(i,j,k) = (SQRT(deli**2. + delk**2.) - R)
+  
+          END DO
         END DO
       END DO
-    END DO
-
+  
 END IF
 
 CONTINUE
