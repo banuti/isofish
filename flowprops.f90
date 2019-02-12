@@ -13,6 +13,7 @@ PARAMETER (imax=181,jmax=7,kmax=101,ipmax=180,jpmax=6,kpmax=100)        !D=20
 ! PARAMETER (imax=181,jmax=4,kmax=101,ipmax=180,jpmax=3,kpmax=100)	!D=20
 ! PARAMETER (imax=361,jmax=7,kmax=201,ipmax=360,jpmax=6,kpmax=200)	!D=40
 
+
  !   PARAMETER (imax=189,jmax=71,kmax=101,ipmax=188,jpmax=70,kpmax=100)
 
 
@@ -30,6 +31,29 @@ REAL, DIMENSION(:,:), ALLOCATABLE::cppnts
 INTEGER ::numpnts,numvar
 
 CONTAINS
+
+!===================================================================
+
+SUBROUTINE init
+
+  CALL readinput
+  CALL initlevelset
+  CALL initfield
+  CALL initqfield
+ 
+  IF (nswit .EQ. 0) THEN 
+    IF (perturb .NE. 0) THEN
+      
+      CALL perturbation
+      WRITE(*,*)'Initilize perturbation'
+
+    END IF
+  END IF  
+
+ 
+END SUBROUTINE
+
+
 
 !===================================================================
 
@@ -74,12 +98,7 @@ epsns = epsns_s
 !      epsns_s = 0.	!0.2
 !      xmue = 0.1	!0.0025
 ! Anstroemgeschwindigkeit
-
-
-!      qinfinity = 1.
-
-WRITE(*,*)'Init with qinfinity',qinfinity
-
+      qinfinity = 1.
 ! angle of attack
 !      alpha_deg = 0.
 ! in Bogenmass
@@ -183,9 +202,7 @@ WRITE(*,*)'reading properties from file...'
 OPEN(10,file='isofish.inp')
 READ(10,*)dummy,nswit,dummy,eps_s,dummy,epsns_s,dummy,xmue,dummy, &
       delt,dummy,nmax,dummy,outoffs,dummy,outint,dummy,alpha_deg, &
-      dummy,perturb,dummy,D,dummy,fieldRad,dummy,geometry, &
-      dummy, qinfinity
-
+      dummy,perturb,dummy,D,dummy,fieldRad,dummy,geometry
 CLOSE(10)
 
 WRITE(*,*)'...done:'
@@ -201,7 +218,6 @@ WRITE(*,*)'outin     = ',outint          !output interval
 WRITE(*,*)'perturb   = ',perturb         !perturbation?
 WRITE(*,*)'fieldRad  = ',fieldRad        !radius for field confinement
 WRITE(*,*)'geometry  = ',geometry        !levelset fct
-WRITE(*,*)'qinfinity = ',qinfinity       !magnitude of velocity
 WRITE(*,*)
 
 
@@ -305,16 +321,16 @@ END IF
 !CONTINOUS CALCULATION AND POSTPROCESSING
 IF ((nswit .EQ. 1) .OR. (nswit .EQ. 3.) )THEN
 
-	WRITE(*,*)'reading previous data file'
-	READ(100) time
-	CLOSE(100)
-	READ(101) ix,jy,kz,l
-	READ(101) (((q(i,j,k,1),i=1,ix),j=1,jy),k=1,kz),(((q(i,j,k,2),i=1,ix),j=1,jy),k=1,kz),&
-				& (((q(i,j,k,3),i=1,ix),j=1,jy),k=1,kz)
-	CLOSE(101)
+  WRITE(*,*)'reading previous data file'
+  READ(100) time
+  CLOSE(100)
+  READ(101) ix,jy,kz,l
+  READ(101) (((q(i,j,k,1),i=1,ix),j=1,jy),k=1,kz),(((q(i,j,k,2),i=1,ix),j=1,jy),k=1,kz),&
+           & (((q(i,j,k,3),i=1,ix),j=1,jy),k=1,kz)
+  CLOSE(101)
 
 
-    time = 0.
+  time = 0.
 
 
 END IF

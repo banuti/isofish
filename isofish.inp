@@ -3,7 +3,7 @@ eps_s		0.3
 epsns_s	0.0
 xmue		0.05
 delt		0.3
-nmax		2000
+nmax		20
 outoffs	1600
 outint	1
 alpha_deg	0.

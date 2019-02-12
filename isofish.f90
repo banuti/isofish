@@ -53,33 +53,15 @@ WRITE(*,*)
 
 !level-set function
 
-CALL readinput !in flowprops.f90
+!CALL readinput !in flowprops.f90
+!CALL initlevelset !in flowprops.f90
+!CALL initfield !in flowprops.f90
+!CALL initqfield !(qinf,nswit,time)
 
-CALL initlevelset !in flowprops.f90
-
-CALL initfield !in flowprops.f90
-
-CALL initqfield !(qinf,nswit,time)
-
+CALL init
 
 
 ! initial conditions
-
-
-!WRITE(*,*)'	MAIN:'
-!WRITE(*,*)'...done:'
-!WRITE(*,*)'nswit	   = ',nswit !computation mode
-!WRITE(*,*)'nmax		   = ',nmax  !timesteps
-!WRITE(*,*)'delt		   = ',delt
-!WRITE(*,*)'eps_s	   = ',eps_s
-!WRITE(*,*)'epsns_s	 = ',epsns_s
-!WRITE(*,*)'xmue		   = ',xmue
-!WRITE(*,*)'alpha_deg = ',alpha_deg    !angle of attack
-!WRITE(*,*)'outoffs	 = ',outoffs  !offset start of output
-!WRITE(*,*)'outint	   = ',outint !output interval
-!WRITE(*,*)'no i      = ',imax
-!WRITE(*,*)'no j      = ',jmax
-!WRITE(*,*)'no k      = ',kmax
 
 
 saved=0
@@ -87,33 +69,33 @@ saved=0
 !----------------------------------------------------------------------
 CALL outhead
 
-
-IF (nswit .EQ. 0) THEN
-  IF (perturb .NE. 0) THEN
-
-    CALL perturbation
-
-  END IF
-END IF
-
-
+!
+!IF (nswit .EQ. 0) THEN
+!  IF (perturb .NE. 0) THEN
+!
+!    CALL perturbation
+!
+!  END IF
+!END IF
+!
+!
 
 
 
 !calculation for every timestep
 
 !*******************LOOP**********************
-      DO 1000 n = 1,nmax
+DO 1000 n = 1,nmax
 
 
-        time = time+delt
-        WRITE(*,*)
-        WRITE(*,*)
-        WRITE(*,*) 'T I M E S T E P: ',n,time
+  time = time+delt
+  WRITE(*,*)
+  WRITE(*,*)
+  WRITE(*,*) 'T I M E S T E P: ',n,time
 
-  IF (n .EQ. nmax) THEN
-          deltat = delt
-   END IF
+!  IF (n .EQ. nmax) THEN
+!          deltat = delt
+!   END IF
 
 
 
