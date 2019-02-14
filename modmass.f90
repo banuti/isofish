@@ -5,15 +5,15 @@ MODULE modmass
 CONTAINS
 
 SUBROUTINE masscon !(phi)
-	USE flowprops
+USE        flowprops
 
 !calculation of phi(n+1) so, that q(n+1) satisfies mass conservation 
 
 !      PARAMETER (imax=189,jmax=71,kmax=101,
 !     &           ipmax=188,jpmax=70,kpmax=100)  
 
-DIMENSION marker_2(ipmax,jpmax,kpmax),		&		!phi(ipmax,jpmax,kpmax), 
-     &          BDXS(jpmax,kpmax), W(2000),&
+DIMENSION marker_2(ipmax,jpmax,kpmax),               &!phi(ipmax,jpmax,kpmax), 
+     &          BDXS(jpmax,kpmax), W(2000),          &
      &          BDXF(jpmax,kpmax), BDYS(ipmax,kpmax),&
      &          BDYF(ipmax,kpmax), BDZS(ipmax,jpmax),&
      &          BDZF(ipmax,jpmax)
@@ -82,7 +82,7 @@ DIMENSION marker_2(ipmax,jpmax,kpmax),		&		!phi(ipmax,jpmax,kpmax),
       zf = kpmax/2-0.5
 
 
-	!instream:
+!instream:
 
 !	phi(1:2,:,:)=0.
 
@@ -90,7 +90,7 @@ DIMENSION marker_2(ipmax,jpmax,kpmax),		&		!phi(ipmax,jpmax,kpmax),
 !	LBDCND=3. !3
 !	MBDCND=3. !3
 !	NBDCND=3. !3
-	
+
 
 CALL HW3CRT(xs,xf,ipmax-1,3,BDXS,BDXF,ys,yf,jpmax-1,3,BDYS,BDYF,zs,zf,kpmax-1,3,BDZS,BDZF,0.,ipmax,jpmax,phi,PERTRB,IERROR,W)
 

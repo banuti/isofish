@@ -7,8 +7,8 @@ CONTAINS
 
 
 SUBROUTINE vort_conf(n) !(qinf,delt,n)
-	USE flowprops
-	USE boundaries
+  USE flowprops
+  USE boundaries
 !
 !vorticity confinement
 
@@ -60,7 +60,7 @@ SUBROUTINE vort_conf(n) !(qinf,delt,n)
      &           +q(ip+1,jp+1,kp,1)-q(ip+1,jp,kp,1))/(4*dely)
            absomega(ip,jp,kp) = -SQRT(max(0.000001,(omega(ip,jp,kp,1)**2&
      &           +omega(ip,jp,kp,2)**2+omega(ip,jp,kp,3)**2)))
-		eta_c(ip,jp,kp) = absomega(ip,jp,kp)
+           eta_c(ip,jp,kp) = absomega(ip,jp,kp)
 10        CONTINUE
 20      CONTINUE
 30    CONTINUE
@@ -88,22 +88,24 @@ SUBROUTINE vort_conf(n) !(qinf,delt,n)
 
 
 !SURFACE CONFINEMENT
-	IF (F(ip,jp,kp) .LE. fieldRad) THEN
+IF (F(ip,jp,kp) .LE. fieldRad) THEN
 
-			neta_x = -Fnormp(ip,jp,kp,1)
-			neta_y = -Fnormp(ip,jp,kp,2)
-			neta_z = -Fnormp(ip,jp,kp,3)
+neta_x = -Fnormp(ip,jp,kp,1)
+neta_y = -Fnormp(ip,jp,kp,2)
+neta_z = -Fnormp(ip,jp,kp,3)
 
 
-			s(1) = neta_z*omega(ip,jp,kp,2)&
-     &				-neta_y*omega(ip,jp,kp,3)
-			s(2) = neta_x*omega(ip,jp,kp,3)&
-     &				-neta_z*omega(ip,jp,kp,1)
-			s(3) = neta_y*omega(ip,jp,kp,1)&
-     &				-neta_x*omega(ip,jp,kp,2)
+s(1) = neta_z*omega(ip,jp,kp,2) &
+     & -neta_y*omega(ip,jp,kp,3)
 
-	!correction
-            DO l = 1,3
+s(2) = neta_x*omega(ip,jp,kp,3) &
+     & -neta_z*omega(ip,jp,kp,1)
+
+s(3) = neta_y*omega(ip,jp,kp,1) &
+     & -neta_x*omega(ip,jp,kp,2)
+
+!correction
+DO l = 1,3
               q(ip+1,jp+1,kp+1,l) = q(ip+1,jp+1,kp+1,l)&
      &              -epsns(ip+1,jp+1,kp+1)*delt*s(l)
               q(ip+1,jp+1,kp,l) = q(ip+1,jp+1,kp,l)&
@@ -120,12 +122,13 @@ SUBROUTINE vort_conf(n) !(qinf,delt,n)
      &              -epsns(ip,jp,kp)*delt*s(l)
               q(ip,jp,kp+1,l) = q(ip,jp,kp+1,l)&
      &              -epsns(ip,jp,kp+1)*delt*s(l)
-		  END DO
+
+END DO
 
 
 
 !FIELD CONFINEMENT
-	ELSE
+ELSE
 
 !nabla(eta) in cellcenter
             neta_x = (eta(ip+1,jp,kp)-eta(ip,jp,kp)&
@@ -184,7 +187,7 @@ SUBROUTINE vort_conf(n) !(qinf,delt,n)
             a_8 = MIN(0.,eta(ip,jp,kp+1)-eta_c(ip,jp,kp))/nenner 
           END IF
 !correction step
-            DO l = 1,3
+DO l = 1,3
               q(ip+1,jp+1,kp+1,l) = q(ip+1,jp+1,kp+1,l)&
      &              +eps(ip+1,jp+1,kp+1)*delt*a_1*s(l)
               q(ip+1,jp+1,kp,l) = q(ip+1,jp+1,kp,l)&
@@ -201,9 +204,9 @@ SUBROUTINE vort_conf(n) !(qinf,delt,n)
      &              +eps(ip,jp,kp)*delt*a_7*s(l)
               q(ip,jp,kp+1,l) = q(ip,jp,kp+1,l)&
      &              +eps(ip,jp,kp+1)*delt*a_8*s(l)
-		  END DO
+END DO
 
-	END IF !field or surface
+END IF !field or surface
 
 80        CONTINUE
 90      CONTINUE
@@ -230,10 +233,10 @@ SUBROUTINE vort_conf(n) !(qinf,delt,n)
 150       CONTINUE
         END IF
       ELSE 
-	  IF (nswit.NE. 3.) THEN
+  IF (nswit.NE. 3.) THEN
           CALL impnoslip      
-	  END IF  
-      END IF       
+  END IF  
+END IF       
 
       RETURN
 END SUBROUTINE

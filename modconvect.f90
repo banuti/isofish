@@ -6,8 +6,8 @@ CONTAINS
 !***********************************************************************
 SUBROUTINE convection !(delt,qinf)
 
-CALL convectinterpolation
-!CALL convectcentraldiff
+!CALL convectinterpolation
+CALL convectcentraldiff
 
 
 END SUBROUTINE
@@ -20,7 +20,7 @@ SUBROUTINE convectcentraldiff
 USE flowprops
 USE boundaries
 
-INTEGER	::i,j,k
+INTEGER ::i,j,k
 
 DIMENSION q_1(imax,jmax,kmax,3) !, qinf(3)
 
@@ -32,30 +32,30 @@ WRITE(*,*) "check: convection (central diff)"
 
 DO i=2,imax-1
   DO j=2,jmax-1
-	DO k=2,kmax-1
+    DO k=2,kmax-1
 
 !x-direction
-q_1(i,j,k,1)=q(i,j,k,1)-delt*( q(i,j,k,1)*( q(i+1,j,k,1)-q(i-1,j,k,1) )/(2*delx) +		&
-				q(i,j,k,2)*( q(i,j+1,k,1)-q(i,j-1,k,1) )/(2*dely) +		&
-				q(i,j,k,3)*( q(i,j,k+1,1)-q(i,j,k-1,1) )/(2*delz)	)
+q_1(i,j,k,1)=q(i,j,k,1)-delt*( q(i,j,k,1)*( q(i+1,j,k,1)-q(i-1,j,k,1) )/(2*delx) +  &
+                                q(i,j,k,2)*( q(i,j+1,k,1)-q(i,j-1,k,1) )/(2*dely) + &
+                                q(i,j,k,3)*( q(i,j,k+1,1)-q(i,j,k-1,1) )/(2*delz)   )
 
 
 
 
 !y-direction
-q_1(i,j,k,2)=q(i,j,k,2)-delt*( q(i,j,k,1)*( q(i+1,j,k,2)-q(i-1,j,k,2) )/(2*delx) +		&
-				q(i,j,k,2)*( q(i,j+1,k,2)-q(i,j-1,k,2) )/(2*dely) +		&
-				q(i,j,k,3)*( q(i,j,k+1,2)-q(i,j,k-1,2) )/(2*delz)	)
+q_1(i,j,k,2)=q(i,j,k,2)-delt*( q(i,j,k,1)*( q(i+1,j,k,2)-q(i-1,j,k,2) )/(2*delx) +   &
+                                q(i,j,k,2)*( q(i,j+1,k,2)-q(i,j-1,k,2) )/(2*dely) +  &
+                                q(i,j,k,3)*( q(i,j,k+1,2)-q(i,j,k-1,2) )/(2*delz)    )
 
 
 
 !z-direction
-q_1(i,j,k,3)=q(i,j,k,3)-delt*( q(i,j,k,1)*( q(i+1,j,k,3)-q(i-1,j,k,3) )/(2*delx) +		&
-				q(i,j,k,2)*( q(i,j+1,k,3)-q(i,j-1,k,3) )/(2*dely) +		&
-				q(i,j,k,3)*( q(i,j,k+1,3)-q(i,j,k-1,3) )/(2*delz)	)
+q_1(i,j,k,3)=q(i,j,k,3)-delt*( q(i,j,k,1)*( q(i+1,j,k,3)-q(i-1,j,k,3) )/(2*delx) +   &
+                                q(i,j,k,2)*( q(i,j+1,k,3)-q(i,j-1,k,3) )/(2*dely) +  &
+                                q(i,j,k,3)*( q(i,j,k+1,3)-q(i,j,k-1,3) )/(2*delz)    )
 
 
-	END DO
+    END DO
   END DO
 END DO
 
@@ -64,7 +64,7 @@ END DO
 !boundary
       CALL boundary_num(q_1) !(imax,jmax,kmax,q_1,qinf)
 
-	  q=q_1
+      q=q_1
 
 !no slip
       CALL impnoslip
