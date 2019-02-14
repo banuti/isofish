@@ -103,14 +103,12 @@ DO 1000 n = 1,nmax
 
   IF (nswit .NE. 3) THEN
 
-    !		IF (n .LT. 10) THEN
     !convection calculation
-    CALL convection !(delt,qinf)
-    !		END IF
-
+    CALL convection
 
     !add diffusion
-    CALL diffusion !(xmue,delt,qinf)
+    CALL diffusion 
+
   END IF
 
 !
