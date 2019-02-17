@@ -1,5 +1,5 @@
-#FC =     mpif90
-FC = gfortran-4.9
+FC =     mpif90
+#FC = gfortran-4.9
 .SUFFIXES:
 .SUFFIXES: .f .f90 .F90 .o
 
@@ -10,7 +10,7 @@ FC = gfortran-4.9
 # INCLUDE = -I${MKLROOT}/include
 
 # for mpif90
-# FFLAGS = -fno-align-commons
+FFLAGS = -fno-align-commons -O3
 
 
 EXE = isofish

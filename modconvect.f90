@@ -6,8 +6,8 @@ CONTAINS
 !***********************************************************************
 SUBROUTINE convection !(delt,qinf)
 
-!CALL convectinterpolation
-CALL convectcentraldiff
+CALL convectinterpolation
+!CALL convectcentraldiff
 
 
 END SUBROUTINE
